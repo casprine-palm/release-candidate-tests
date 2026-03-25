@@ -198,7 +198,7 @@ async function main() {
         return item.outcome ? `${line}\n  _${item.outcome}_` : line;
       }).join('\n');
       return [
-        { type: 'section', text: { type: 'mrkdwn', text: `*[${scope}]*\n${bullets}` } },
+        { type: 'section', text: { type: 'mrkdwn', text: `*${scope}*\n${bullets}` } },
       ];
     });
 
@@ -221,10 +221,10 @@ async function main() {
   // ---------------------------------------------------------------------------
   const releaseBody = scopeKeys.map(scope => {
     const bullets = grouped[scope].map(item => {
-      const desc = item.outcome ? ` — ${item.outcome}` : '';
+      const desc = item.outcome ? `\n  ${item.outcome}` : '';
       return `- ${item.title}${desc}`;
     }).join('\n');
-    return `### [${scope}]\n${bullets}`;
+    return `### ${scope}\n${bullets}`;
   }).join('\n\n');
 
   const tagName = `daily-${today}`;
