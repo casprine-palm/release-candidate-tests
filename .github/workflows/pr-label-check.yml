@@ -1,0 +1,105 @@
+name: PR Label Check
+
+on:
+  pull_request:
+    types: [opened, labeled, unlabeled, synchronize, reopened]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  check-labels:
+    name: Verify PR labels
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check required labels
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = context.payload.pull_request.labels.map(l => l.name);
+            const pr = context.payload.pull_request.number;
+
+            const scopeLabels = labels.filter(l => l.startsWith('scope:'));
+            const changeLabels = labels.filter(l => l.startsWith('change:'));
+
+            const hasRelease   = labels.includes('change:release');
+            const hasReleaseFf = labels.includes('change:release-ff');
+
+            const errors = [];
+
+            if (scopeLabels.length === 0) {
+              errors.push('❌ **Missing scope label** — add at least one of: `scope:fe`, `scope:be`, `scope:ml`, `scope:data`');
+            }
+
+            if (changeLabels.length === 0) {
+              errors.push('❌ **Missing change type label** — add at least one of: `change:feat`, `change:fix`, `change:perf`, `change:breaking`, `change:refactor`, `change:chore`, `change:docs`, `change:release`, `change:release-ff`');
+            }
+
+            if (hasRelease && hasReleaseFf) {
+              errors.push('❌ **Conflicting release labels** — `change:release` and `change:release-ff` cannot both be applied to the same PR. Use `change:release` for customer-visible changes, `change:release-ff` for internal/fast-forward changes.');
+            }
+
+            if (errors.length > 0) {
+              // Post or update a comment
+              const marker = '<!-- pr-label-check -->';
+              const body = [
+                marker,
+                '## PR Label Check Failed',
+                '',
+                errors.join('\n'),
+                '',
+                '---',
+                '**Required label format:**',
+                '- At least one `scope:` label (`scope:fe`, `scope:be`, `scope:ml`, `scope:data`)',
+                '- At least one `change:` label (`change:feat`, `change:fix`, `change:perf`, `change:breaking`, `change:refactor`, `change:chore`, `change:docs`, `change:release`, `change:release-ff`)',
+                '- `change:release` and `change:release-ff` are mutually exclusive',
+              ].join('\n');
+
+              // Find existing bot comment
+              const comments = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr,
+              });
+
+              const existing = comments.data.find(c => c.body.includes(marker));
+              if (existing) {
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: existing.id,
+                  body,
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: pr,
+                  body,
+                });
+              }
+
+              core.setFailed(`Label check failed:\n${errors.join('\n')}`);
+            } else {
+              // Clean up any existing failure comment
+              const comments = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr,
+              });
+
+              const marker = '<!-- pr-label-check -->';
+              const existing = comments.data.find(c => c.body.includes(marker));
+              if (existing) {
+                await github.rest.issues.deleteComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: existing.id,
+                });
+              }
+
+              console.log('✅ Label check passed');
+              console.log(`  Scope labels:  ${scopeLabels.join(', ')}`);
+              console.log(`  Change labels: ${changeLabels.join(', ')}`);
+            }
