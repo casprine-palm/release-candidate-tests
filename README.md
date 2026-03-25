@@ -21,3 +21,4 @@ batch/data-fix
 batch/fe-be-feat
 batch/be-chore
 batch/ml-feat
+batch/fe-fix
