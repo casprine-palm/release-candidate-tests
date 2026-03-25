@@ -19,3 +19,4 @@ batch/be-breaking
 batch/ml-perf
 batch/data-fix
 batch/fe-be-feat
+batch/be-chore
