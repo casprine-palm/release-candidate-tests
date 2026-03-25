@@ -9,3 +9,5 @@ Added support for bulk export of transaction data.
 ## ML feat — confidence intervals for forecasts
 
 ## DATA chore — migrate ETL pipeline to dbt v1.8
+
+## API breaking change — /api/v2/transactions
