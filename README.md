@@ -11,3 +11,5 @@ Added support for bulk export of transaction data.
 ## DATA chore — migrate ETL pipeline to dbt v1.8
 
 ## API breaking change — /api/v2/transactions
+
+## Format test
