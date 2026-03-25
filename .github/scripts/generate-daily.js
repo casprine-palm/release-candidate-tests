@@ -174,19 +174,31 @@ async function main() {
     prs: items,
   };
 
+  // Group items by scope label
+  const SCOPE_ORDER = ['FE', 'BE', 'ML', 'DATA'];
+  const grouped = {};
+  for (const item of items) {
+    const scopes = item.scope ? item.scope.replace(/[\[\]]/g, '').split('/') : ['OTHER'];
+    for (const s of scopes) {
+      if (!grouped[s]) grouped[s] = [];
+      grouped[s].push(item);
+    }
+  }
+  const scopeKeys = [...SCOPE_ORDER.filter(s => grouped[s]), ...Object.keys(grouped).filter(s => !SCOPE_ORDER.includes(s))];
+
   // ---------------------------------------------------------------------------
   // 1. Post to Slack
   // ---------------------------------------------------------------------------
   if (process.env.SLACK_WEBHOOK_RELEASES) {
     const webhook = new IncomingWebhook(process.env.SLACK_WEBHOOK_RELEASES);
 
-    const prBlocks = items.flatMap(item => {
-      const lines = [`*<${item.url}|#${item.pr_number} ${item.title}>*  ${item.scope}`];
-      if (item.change_types.length) lines.push(`_${item.change_types.join(', ')}_`);
-      if (item.outcome) lines.push(item.outcome);
+    const scopeBlocks = scopeKeys.flatMap(scope => {
+      const bullets = grouped[scope].map(item => {
+        const line = `• <${item.url}|${item.title}>`;
+        return item.outcome ? `${line}\n  _${item.outcome}_` : line;
+      }).join('\n');
       return [
-        { type: 'section', text: { type: 'mrkdwn', text: lines.join('\n') } },
-        { type: 'divider' },
+        { type: 'section', text: { type: 'mrkdwn', text: `*[${scope}]*\n${bullets}` } },
       ];
     });
 
@@ -196,12 +208,7 @@ async function main() {
           type: 'header',
           text: { type: 'plain_text', text: `Daily Release Notes — ${today}` },
         },
-        {
-          type: 'section',
-          text: { type: 'mrkdwn', text: `*${items.length} change${items.length !== 1 ? 's' : ''}* merged today` },
-        },
-        { type: 'divider' },
-        ...prBlocks,
+        ...scopeBlocks,
       ],
     });
     console.log('Posted to Slack');
@@ -212,13 +219,13 @@ async function main() {
   // ---------------------------------------------------------------------------
   // 2. Create GitHub Release (used by weekly/monthly aggregation)
   // ---------------------------------------------------------------------------
-  const releaseBody = items.map(item => {
-    const lines = [`### #${item.pr_number} ${item.title} ${item.scope}`];
-    if (item.change_types.length) lines.push(`**Type:** ${item.change_types.join(', ')}`);
-    if (item.outcome) lines.push(`\n${item.outcome}`);
-    lines.push(`_Merged: ${item.merged_at} by @${item.author}_`);
-    return lines.join('\n');
-  }).join('\n\n---\n\n');
+  const releaseBody = scopeKeys.map(scope => {
+    const bullets = grouped[scope].map(item => {
+      const desc = item.outcome ? ` — ${item.outcome}` : '';
+      return `- ${item.title}${desc}`;
+    }).join('\n');
+    return `### [${scope}]\n${bullets}`;
+  }).join('\n\n');
 
   const tagName = `daily-${today}`;
   const headSha = await getHeadSha();
