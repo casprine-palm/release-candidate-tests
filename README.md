@@ -7,3 +7,5 @@ Added support for bulk export of transaction data.
 ## BE perf — optimize transaction query
 
 ## ML feat — confidence intervals for forecasts
+
+## DATA chore — migrate ETL pipeline to dbt v1.8
