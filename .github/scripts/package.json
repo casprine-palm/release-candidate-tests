@@ -1,0 +1,16 @@
+{
+  "name": "release-scripts",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate-daily": "node generate-daily.js",
+    "generate-weekly": "node generate-weekly.js",
+    "generate-monthly": "node generate-monthly.js"
+  },
+  "dependencies": {
+    "@octokit/rest": "^21.0.2",
+    "@slack/webhook": "^7.0.3",
+    "@anthropic-ai/sdk": "^0.39.0"
+  }
+}
