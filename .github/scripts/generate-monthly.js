@@ -91,13 +91,18 @@ async function main() {
     systemPrompt = readFileSync(join(__dirname, '../../../prompts/monthly-marketing.md'), 'utf-8');
   }
 
-  console.log('Calling Claude API for monthly summary...');
-  const summary = await callClaude(
-    systemPrompt,
-    `Month: ${label}\n\nDaily release notes:\n\n${aggregated}`
-  );
-
-  console.log('Monthly summary:\n', summary);
+  let summary;
+  if (!process.env.ANTHROPIC_API_KEY) {
+    console.warn('ANTHROPIC_API_KEY not set — using raw aggregated notes as summary');
+    summary = aggregated;
+  } else {
+    console.log('Calling Claude API for monthly summary...');
+    summary = await callClaude(
+      systemPrompt,
+      `Month: ${label}\n\nDaily release notes:\n\n${aggregated}`
+    );
+    console.log('Monthly summary:\n', summary);
+  }
 
   // Post to Slack
   if (process.env.SLACK_WEBHOOK_RELEASES) {
