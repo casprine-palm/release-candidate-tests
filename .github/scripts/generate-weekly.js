@@ -125,6 +125,30 @@ async function main() {
     console.warn('SLACK_WEBHOOK_RELEASES not set — skipping Slack');
   }
 
+  // Publish as a GitHub Release so monthly can aggregate the last 4 weeklies
+  const tagName = `weekly-${weekEnding}`;
+  const headSha = (await octokit.repos.getBranch({ owner, repo, branch: 'main' })).data.commit.sha;
+
+  await octokit.git.createRef({ owner, repo, ref: `refs/tags/${tagName}`, sha: headSha })
+    .catch(async (err) => {
+      if (err.status === 422) {
+        await octokit.git.updateRef({ owner, repo, ref: `tags/${tagName}`, sha: headSha, force: true });
+      } else throw err;
+    });
+
+  const existingReleases = await octokit.repos.listReleases({ owner, repo, per_page: 10 });
+  const existing = existingReleases.data.find(r => r.tag_name === tagName);
+  if (existing) await octokit.repos.deleteRelease({ owner, repo, release_id: existing.id });
+
+  const { data: weeklyRelease } = await octokit.repos.createRelease({
+    owner, repo,
+    tag_name: tagName,
+    name: `Weekly Product Update — ${weekEnding}`,
+    body: summary,
+    prerelease: false,
+  });
+  console.log(`Created GitHub Release: ${weeklyRelease.html_url}`);
+
   console.log('Weekly workflow complete.');
 }
 
