@@ -28,20 +28,22 @@ jobs:
             const hasReleaseFf = labels.includes('change:release-ff');
 
             // --- Body section validators ---
-            // A section is "filled" if it exists and has non-placeholder, non-empty content after the heading
+            // Splits body into sections and returns the text content under a given heading
             function sectionContent(heading) {
-              const re = new RegExp(`##\\s+${heading}\\s*\\n([\\s\\S]*?)(?=\\n##|$)`, 'i');
-              const match = body_text.match(re);
-              if (!match) return '';
-              // Strip HTML comments and whitespace
-              return match[1].replace(/<!--[\s\S]*?-->/g, '').trim();
-            }
-
-            function hasMedia() {
-              const content = sectionContent('Media');
-              if (!content) return false;
-              // Accept if it contains an image/video attachment, a URL, or explicit "N/A"
-              return /!\[|https?:\/\/|\.mp4|\.gif|\.mov|\.webm|n\/a/i.test(content);
+              const lines = body_text.split('\n');
+              let inSection = false;
+              const content = [];
+              for (const line of lines) {
+                if (/^##\s+/i.test(line)) {
+                  if (inSection) break;
+                  if (line.replace(/^##\s+/i, '').trim().toLowerCase() === heading.toLowerCase()) {
+                    inSection = true;
+                    continue;
+                  }
+                }
+                if (inSection) content.push(line);
+              }
+              return content.join('\n').replace(/<!--[\s\S]*?-->/g, '').trim();
             }
 
             const errors = [];
