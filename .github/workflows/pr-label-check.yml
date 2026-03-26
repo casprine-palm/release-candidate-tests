@@ -61,12 +61,6 @@ jobs:
             if (!sectionContent('Outcome')) {
               errors.push('❌ **Outcome is required** — describe the user-facing or system impact in the `## Outcome` section');
             }
-            if (!sectionContent('Steps to test')) {
-              errors.push('❌ **Steps to test is required** — add at least one test step in the `## Steps to test` section');
-            }
-            if (!hasMedia()) {
-              errors.push('❌ **Media is required** — attach a screenshot, recording, or write `N/A — no UI change` in the `## Media` section');
-            }
 
             if (errors.length > 0) {
               // Post or update a comment
@@ -81,8 +75,6 @@ jobs:
                 '**Required:**',
                 '- At least one `scope:` label and one `change:` label',
                 '- `## Outcome` — what changed for users or the system',
-                '- `## Steps to test` — how to verify the change',
-                '- `## Media` — screenshot/recording, or `N/A — no UI change`',
               ].join('\n');
 
               // Find existing bot comment
@@ -132,6 +124,4 @@ jobs:
               console.log(`  Scope labels:  ${scopeLabels.join(', ')}`);
               console.log(`  Change labels: ${changeLabels.join(', ')}`);
               console.log('  Outcome:       ✓');
-              console.log('  Steps to test: ✓');
-              console.log('  Media:         ✓');
             }
