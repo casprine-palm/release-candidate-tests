@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh auth:*)",
+      "Bash(gh repo:*)",
+      "Bash(git clone:*)",
+      "Bash(git init:*)",
+      "Bash(git remote:*)",
+      "Bash(git fetch:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(gh label:*)",
+      "Bash(gh pr:*)",
+      "Bash(git pull:*)",
+      "Bash(gh run:*)",
+      "Bash(README.md:*)",
+      "Bash(gh workflow:*)",
+      "Bash(__NEW_LINE_d1204b50f41abcde__ gh:*)",
+      "Bash(for pr:*)",
+      "Bash(do)",
+      "Bash(echo \"Merging PR #$pr...\")",
+      "Bash(done)",
+      "Bash(grep -v \"^\\\\s*$\")",
+      "Bash(gh release:*)",
+      "Bash(npm install:*)",
+      "Bash(gh secret:*)"
+    ]
+  }
+}
