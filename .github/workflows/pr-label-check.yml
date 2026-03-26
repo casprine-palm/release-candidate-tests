@@ -18,6 +18,7 @@ jobs:
         with:
           script: |
             const labels = context.payload.pull_request.labels.map(l => l.name);
+            const body_text = context.payload.pull_request.body || '';
             const pr = context.payload.pull_request.number;
 
             const scopeLabels = labels.filter(l => l.startsWith('scope:'));
@@ -26,18 +27,45 @@ jobs:
             const hasRelease   = labels.includes('change:release');
             const hasReleaseFf = labels.includes('change:release-ff');
 
+            // --- Body section validators ---
+            // A section is "filled" if it exists and has non-placeholder, non-empty content after the heading
+            function sectionContent(heading) {
+              const re = new RegExp(`##\\s+${heading}\\s*\\n([\\s\\S]*?)(?=\\n##|$)`, 'i');
+              const match = body_text.match(re);
+              if (!match) return '';
+              // Strip HTML comments and whitespace
+              return match[1].replace(/<!--[\s\S]*?-->/g, '').trim();
+            }
+
+            function hasMedia() {
+              const content = sectionContent('Media');
+              if (!content) return false;
+              // Accept if it contains an image/video attachment, a URL, or explicit "N/A"
+              return /!\[|https?:\/\/|\.mp4|\.gif|\.mov|\.webm|n\/a/i.test(content);
+            }
+
             const errors = [];
 
+            // Label checks
             if (scopeLabels.length === 0) {
               errors.push('❌ **Missing scope label** — add at least one of: `scope:fe`, `scope:be`, `scope:ml`, `scope:data`');
             }
-
             if (changeLabels.length === 0) {
               errors.push('❌ **Missing change type label** — add at least one of: `change:feat`, `change:fix`, `change:perf`, `change:breaking`, `change:refactor`, `change:chore`, `change:docs`, `change:release`, `change:release-ff`');
             }
-
             if (hasRelease && hasReleaseFf) {
-              errors.push('❌ **Conflicting release labels** — `change:release` and `change:release-ff` cannot both be applied to the same PR. Use `change:release` for customer-visible changes, `change:release-ff` for internal/fast-forward changes.');
+              errors.push('❌ **Conflicting release labels** — `change:release` and `change:release-ff` cannot both be applied to the same PR.');
+            }
+
+            // Body checks
+            if (!sectionContent('Outcome')) {
+              errors.push('❌ **Outcome is required** — describe the user-facing or system impact in the `## Outcome` section');
+            }
+            if (!sectionContent('Steps to test')) {
+              errors.push('❌ **Steps to test is required** — add at least one test step in the `## Steps to test` section');
+            }
+            if (!hasMedia()) {
+              errors.push('❌ **Media is required** — attach a screenshot, recording, or write `N/A — no UI change` in the `## Media` section');
             }
 
             if (errors.length > 0) {
@@ -45,15 +73,16 @@ jobs:
               const marker = '<!-- pr-label-check -->';
               const body = [
                 marker,
-                '## PR Label Check Failed',
+                '## PR Check Failed',
                 '',
                 errors.join('\n'),
                 '',
                 '---',
-                '**Required label format:**',
-                '- At least one `scope:` label (`scope:fe`, `scope:be`, `scope:ml`, `scope:data`)',
-                '- At least one `change:` label (`change:feat`, `change:fix`, `change:perf`, `change:breaking`, `change:refactor`, `change:chore`, `change:docs`, `change:release`, `change:release-ff`)',
-                '- `change:release` and `change:release-ff` are mutually exclusive',
+                '**Required:**',
+                '- At least one `scope:` label and one `change:` label',
+                '- `## Outcome` — what changed for users or the system',
+                '- `## Steps to test` — how to verify the change',
+                '- `## Media` — screenshot/recording, or `N/A — no UI change`',
               ].join('\n');
 
               // Find existing bot comment
@@ -99,7 +128,10 @@ jobs:
                 });
               }
 
-              console.log('✅ Label check passed');
+              console.log('✅ PR check passed');
               console.log(`  Scope labels:  ${scopeLabels.join(', ')}`);
               console.log(`  Change labels: ${changeLabels.join(', ')}`);
+              console.log('  Outcome:       ✓');
+              console.log('  Steps to test: ✓');
+              console.log('  Media:         ✓');
             }
