@@ -75,7 +75,11 @@ async function main() {
     .map(r => `## ${r.name}\n\n${r.body}`)
     .join('\n\n---\n\n');
 
-  const weekEnding = new Date().toISOString().split('T')[0];
+  const now = new Date();
+  const dd = String(now.getUTCDate()).padStart(2, '0');
+  const mm = String(now.getUTCMonth() + 1).padStart(2, '0');
+  const yyyy = now.getUTCFullYear();
+  const weekEnding = `${dd}-${mm}-${yyyy}`;
 
   // Load prompt
   const promptPath = join(__dirname, '../../prompts/weekly-marketing.md');
