@@ -83,8 +83,11 @@ async function main() {
     console.log('Monthly summary:\n', summary);
   }
 
-  // Strip leading bold title line — the Slack header block already provides the title
-  const slackBody = summary.replace(/^\*\*[^*\n]+\*\*\n+/, '').trim();
+  // Convert markdown bold (**text**) to Slack mrkdwn bold (*text*), then strip any leading title line
+  const slackBody = summary
+    .replace(/\*\*([^*\n]+)\*\*/g, '*$1*')
+    .replace(/^\*[^*\n]+\*\n+/, '')
+    .trim();
 
   // Post to Slack
   if (process.env.SLACK_WEBHOOK_RELEASES) {
