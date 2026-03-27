@@ -145,7 +145,8 @@ async function main() {
     process.exit(0);
   }
 
-  const today = new Date().toISOString().split('T')[0];
+  const _now = new Date();
+  const today = `${String(_now.getUTCDate()).padStart(2,'0')}-${String(_now.getUTCMonth()+1).padStart(2,'0')}-${_now.getUTCFullYear()}`;
 
   // Build structured payload
   const items = releasePRs.map(pr => {
