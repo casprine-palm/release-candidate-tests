@@ -83,6 +83,9 @@ async function main() {
     console.log('Monthly summary:\n', summary);
   }
 
+  // Strip leading bold title line — the Slack header block already provides the title
+  const slackBody = summary.replace(/^\*\*[^*\n]+\*\*\n+/, '').trim();
+
   // Post to Slack
   if (process.env.SLACK_WEBHOOK_RELEASES) {
     const webhook = new IncomingWebhook(process.env.SLACK_WEBHOOK_RELEASES);
@@ -94,7 +97,7 @@ async function main() {
         },
         {
           type: 'section',
-          text: { type: 'mrkdwn', text: summary },
+          text: { type: 'mrkdwn', text: slackBody },
         },
         {
           type: 'context',

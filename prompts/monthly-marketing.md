@@ -8,8 +8,6 @@ Given the last 4 weekly product summaries, produce a punchy monthly summary in t
 
 ## Format
 
-**{PRODUCT_NAME} Monthly Update — {MONTH} {YEAR}**
-
 {4–6 bullet points covering the most impactful themes of the month}
 
 {1 sentence closing — forward-looking or momentum-building}

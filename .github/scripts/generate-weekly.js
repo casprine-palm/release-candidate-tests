@@ -103,6 +103,9 @@ async function main() {
     console.log('Weekly summary:\n', summary);
   }
 
+  // Strip leading bold title line (e.g. "**This Week in Palm — ...**\n\n") — the Slack header block already provides the title
+  const slackBody = summary.replace(/^\*\*[^*\n]+\*\*\n+/, '').trim();
+
   // Post to Slack
   if (process.env.SLACK_WEBHOOK_RELEASES) {
     const webhook = new IncomingWebhook(process.env.SLACK_WEBHOOK_RELEASES);
@@ -114,7 +117,7 @@ async function main() {
         },
         {
           type: 'section',
-          text: { type: 'mrkdwn', text: summary },
+          text: { type: 'mrkdwn', text: slackBody },
         },
         {
           type: 'context',

@@ -8,8 +8,6 @@ Given this week's daily release notes (aggregated from multiple days), produce a
 
 ## Format
 
-**This Week in {PRODUCT_NAME} — {WEEK_ENDING_DATE}**
-
 {2–4 bullet points highlighting the most impactful changes}
 
 {1 sentence closing — forward-looking or momentum-building}

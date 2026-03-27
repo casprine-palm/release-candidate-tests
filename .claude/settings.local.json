@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(gh api:*)",
-      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(''''protection set:'''', list\\(d.get\\(''''required_status_checks'''',{}\\).get\\(''''checks'''',[]\\)\\)\\)\"e)"
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(''''protection set:'''', list\\(d.get\\(''''required_status_checks'''',{}\\).get\\(''''checks'''',[]\\)\\)\\)\"e)",
+      "Bash(__NEW_LINE_10394cdd228094ff__ gh:*)",
+      "Bash(for tag:*)",
+      "Bash(echo \"=== $tag ===\")"
     ]
   }
 }
