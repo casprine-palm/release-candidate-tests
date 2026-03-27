@@ -139,10 +139,10 @@ async function main() {
 
   const allMerged = await getMergedPRsSince(since);
   const releasePRs = allMerged.filter(pr =>
-    pr.labels.some(l => l.name === 'change:release')
+    pr.labels.some(l => l.name === 'change:release' || l.name === 'change:release-ff')
   );
 
-  console.log(`Found ${allMerged.length} merged PRs, ${releasePRs.length} with change:release`);
+  console.log(`Found ${allMerged.length} merged PRs, ${releasePRs.length} with change:release or change:release-ff`);
 
   if (releasePRs.length === 0) {
     console.log('No release PRs found. Skipping notifications.');
@@ -158,8 +158,9 @@ async function main() {
   // Build structured payload
   const items = releasePRs.map(pr => {
     const scope = formatScopeTag(pr.labels);
+    const featureFlag = pr.labels.some(l => l.name === 'change:release-ff');
     const changeTypes = pr.labels
-      .filter(l => l.name.startsWith('change:') && l.name !== 'change:release')
+      .filter(l => l.name.startsWith('change:') && l.name !== 'change:release' && l.name !== 'change:release-ff')
       .map(l => l.name.replace('change:', ''));
     const outcome = extractOutcomeSection(pr.body);
 
@@ -169,6 +170,7 @@ async function main() {
       url: pr.html_url,
       scope,
       change_types: changeTypes,
+      feature_flag: featureFlag,
       merged_at: pr.merged_at,
       outcome,
       author: pr.user.login,
@@ -202,7 +204,8 @@ async function main() {
 
     const scopeBlocks = scopeKeys.flatMap(scope => {
       const bullets = grouped[scope].map(item => {
-        const line = `• <${item.url}|${item.title}>`;
+        const ffTag = item.feature_flag ? ' 🚩 _feature flag_' : '';
+        const line = `• <${item.url}|${item.title}>${ffTag}`;
         return item.outcome ? `${line}\n  _${item.outcome}_` : line;
       }).join('\n');
       return [
@@ -229,8 +232,9 @@ async function main() {
   // ---------------------------------------------------------------------------
   const releaseBody = scopeKeys.map(scope => {
     const bullets = grouped[scope].map(item => {
+      const ffTag = item.feature_flag ? ' _(behind feature flag)_' : '';
       const desc = item.outcome ? `\n  ${item.outcome}` : '';
-      return `- ${item.title}${desc}`;
+      return `- ${item.title}${ffTag}${desc}`;
     }).join('\n');
     return `### ${scope}\n${bullets}`;
   }).join('\n\n');

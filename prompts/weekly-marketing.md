@@ -26,7 +26,7 @@ End with a single forward-looking sentence on its own line (no heading).
 - Length: ~120–160 words total
 - Headings: short noun phrases, no "You can now" — e.g. "Faster navigation", "Smarter forecasts", "Stronger security"
 - Description: full sentence(s), starts with capital letter, no leading bullet or dash
-- Omit any items labelled `change:release-ff` — these are internal
+- Items marked `(behind feature flag)` in the notes are live but require a flag to be enabled — include them and add "available in early access" or "available behind a feature flag" to the description
 - Omit minor bug fixes unless customer-visible
 - Do NOT mention PR numbers, branch names, or implementation details
 - Do NOT add greetings, sign-offs, or filler

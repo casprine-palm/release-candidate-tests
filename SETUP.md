@@ -74,9 +74,12 @@ for label in scope:fe scope:be scope:ml scope:data; do
   gh label create "$label" --color 0075ca --repo OWNER/REPO
 done
 
-for label in change:feat change:fix change:perf change:breaking change:refactor change:chore change:docs change:release change:release-ff; do
+for label in change:feat change:fix change:perf change:breaking change:refactor change:chore change:docs change:release; do
   gh label create "$label" --color e4e669 --repo OWNER/REPO
 done
+
+# change:release-ff gets its own colour to distinguish it visually
+gh label create "change:release-ff" --color 1d76db --description "Released behind a feature flag" --repo OWNER/REPO
 ```
 
 ---

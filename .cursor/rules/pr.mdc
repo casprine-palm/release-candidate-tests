@@ -43,9 +43,9 @@ Pick the most accurate change type. Add `change:release` alongside it if the cha
 | `change:chore` | Tooling, deps, CI, config |
 | `change:docs` | Documentation only |
 | `change:release` | Add alongside any label when this should appear in release notes |
-| `change:release-ff` | Internal fast-forward merge — never shown in external release notes |
+| `change:release-ff` | Released behind a feature flag — appears in release notes marked as early access |
 
-`change:release` and `change:release-ff` are mutually exclusive.
+`change:release` and `change:release-ff` are mutually exclusive — a change is either fully live or behind a flag, not both.
 
 ## 4 — PR template
 

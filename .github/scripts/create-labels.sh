@@ -36,6 +36,6 @@ create "change:docs"       "e4e669" "Documentation only"
 
 # Release labels — green / grey
 create "change:release"    "0e8a16" "Include in daily release notes"
-create "change:release-ff" "cfd3d7" "Internal fast-forward merge — excluded from release notes"
+create "change:release-ff" "1d76db" "Released behind a feature flag — included in release notes as early access"
 
 echo "Done."

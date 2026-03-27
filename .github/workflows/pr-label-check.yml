@@ -57,7 +57,7 @@ jobs:
               errors.push('❌ **Missing change type label** — add at least one of: `change:feat`, `change:fix`, `change:perf`, `change:breaking`, `change:refactor`, `change:chore`, `change:docs`, `change:release`, `change:release-ff`');
             }
             if (hasRelease && hasReleaseFf) {
-              errors.push('❌ **Conflicting release labels** — `change:release` and `change:release-ff` cannot both be applied to the same PR.');
+              errors.push('❌ **Conflicting release labels** — use `change:release` for fully live changes or `change:release-ff` for changes behind a feature flag, not both.');
             }
 
             // Body checks

@@ -1,40 +1,38 @@
+# Release Notes Pipeline
 
-## Phase 3 test feature
+Automated release notes — daily Slack digests, weekly AI-generated product summaries, and monthly marketing updates — driven entirely by PR labels and merge activity.
 
-Added support for bulk export of transaction data.
-## feat: redesign dashboard with improved data visualizations
+## How it works
 
-## BE perf — optimize transaction query
+1. **Every PR** must have a `scope:` label, a `change:` label, and a filled `## Outcome` section (enforced by CI).
+2. **Daily** (07:00 UTC, Mon–Fri): picks up all PRs merged since the last run that carry `change:release` or `change:release-ff`, groups them by scope, posts to Slack, and creates a GitHub Pre-release as a data store. Feature-flagged items are marked 🚩.
+3. **Weekly** (Friday 07:00 UTC): aggregates the week's daily releases, sends them to Claude to produce a customer-facing summary, posts to Slack, and saves as a GitHub Release.
+4. **Monthly** (first Monday 07:00 UTC): aggregates the last 4 weekly releases through Claude for a marketing-ready monthly update, posts to Slack.
 
-## ML feat — confidence intervals for forecasts
+## Labels
 
-## DATA chore — migrate ETL pipeline to dbt v1.8
+| Label | Purpose |
+|---|---|
+| `scope:fe` `scope:be` `scope:ml` `scope:data` | Which part of the system changed |
+| `change:feat` | New feature |
+| `change:fix` | Bug fix |
+| `change:perf` | Performance improvement |
+| `change:breaking` | Breaking change |
+| `change:refactor` `change:chore` `change:docs` | Internal |
+| `change:release` | Include in daily release notes — fully live |
+| `change:release-ff` | Include in daily release notes — behind a feature flag |
 
-## API breaking change — /api/v2/transactions
+`change:release` and `change:release-ff` are mutually exclusive.
 
-## Format test
-format v2 test
-batch/fe-feat
-batch/be-breaking
-batch/ml-perf
-batch/data-fix
-batch/fe-be-feat
-batch/be-chore
-batch/ml-feat
-batch/fe-fix
-batch/be-feat
-batch/ml-fix
-batch/data-feat
-batch/fe-ml-feat
-batch/be-fix
-batch/data-ff
-batch/be-ml-perf
-batch/fe-docs
-slack test
-// transaction export filters
-<!-- sidebar entity groups -->
-<!-- webhook hmac signing -->
-<!-- forecast recalibration -->
-<!-- cursor pagination export -->
-<!-- dark mode support -->
-<!-- forecast latency improvement -->
+## Secrets required
+
+| Secret | Value |
+|---|---|
+| `SLACK_WEBHOOK_RELEASES` | Slack incoming webhook URL |
+| `ANTHROPIC_API_KEY` | Claude API key (for weekly + monthly summaries) |
+| `KNOWLEDGE_HUB_ENDPOINT` | Optional — REST endpoint to push daily payload |
+| `KNOWLEDGE_HUB_TOKEN` | Optional — Bearer token for Knowledge Hub |
+
+## Setup guide for a new repo
+
+See [`SETUP.md`](SETUP.md) for full step-by-step instructions including backfill procedures.

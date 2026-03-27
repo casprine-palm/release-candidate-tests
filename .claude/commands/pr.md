@@ -32,7 +32,7 @@ Pick the most accurate one (and add `change:release` if this change is customer-
 | `change:chore` | Tooling, dependencies, CI, config |
 | `change:docs` | Documentation only |
 | `change:release` | Add this alongside any other label when the change should appear in daily release notes |
-| `change:release-ff` | Fast-forward / internal merge — use instead of `change:release` for internal-only changes |
+| `change:release-ff` | Released behind a feature flag — appears in release notes marked as early access |
 
 ## Step 4 — Draft the PR fields
 
