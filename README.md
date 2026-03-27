@@ -38,3 +38,4 @@ slack test
 <!-- cursor pagination export -->
 <!-- dark mode support -->
 <!-- forecast latency improvement -->
+<!-- v2 accounts API -->
