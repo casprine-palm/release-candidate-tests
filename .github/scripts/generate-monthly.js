@@ -83,8 +83,11 @@ async function main() {
     console.log('Monthly summary:\n', summary);
   }
 
-  // Convert markdown bold (**text**) to Slack mrkdwn bold (*text*)
-  const slackBody = summary.replace(/\*\*([^*\n]+)\*\*/g, '*$1*').trim();
+  // Convert to Slack mrkdwn: **bold** → *bold*, prefix each heading line with • and indent description
+  const slackBody = summary
+    .replace(/\*\*([^*\n]+)\*\*/g, '*$1*')
+    .replace(/^(\*[^*\n]+\*)\n/gm, '• $1\n  ')
+    .trim();
 
   // Post to Slack
   if (process.env.SLACK_WEBHOOK_RELEASES) {
