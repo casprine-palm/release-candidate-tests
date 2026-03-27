@@ -122,7 +122,7 @@ jobs:
                 });
               }
 
-              console.log('✅ PR check passed');
+              console.log('  PR check passed');
               console.log(`  Scope labels:  ${scopeLabels.join(', ')}`);
               console.log(`  Change labels: ${changeLabels.join(', ')}`);
               console.log('  Outcome:       ✓');

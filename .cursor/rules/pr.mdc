@@ -1,0 +1,104 @@
+---
+description: Guide for writing well-formed pull requests with correct labels, summary, outcome, and steps to test
+alwaysApply: false
+---
+
+# Pull Request Writing Guide
+
+When an engineer asks you to help write, draft, or create a PR, follow this process.
+
+## 1 — Read the changes first
+
+Before writing anything, run:
+- `git diff main...HEAD --stat` to see which files changed
+- `git log main...HEAD --oneline` to see the commit history
+- `git diff main...HEAD` to read the actual changes
+
+Do not draft the PR until you have read the diff. The Outcome must reflect what the code actually does.
+
+## 2 — Scope labels
+
+Map changed files to the correct `scope:` labels. A PR can have more than one.
+
+| Label | Applies to |
+|---|---|
+| `scope:fe` | Frontend, UI, web client |
+| `scope:be` | Backend, API, server, services |
+| `scope:ml` | ML models, inference, training pipelines |
+| `scope:data` | Data pipelines, ETL, analytics, warehousing |
+
+Adapt to this repo's actual directory structure — look at the file paths in the diff.
+
+## 3 — Change type labels
+
+Pick the most accurate change type. Add `change:release` alongside it if the change is customer-facing or system-impacting and should appear in the daily release notes.
+
+| Label | Use when |
+|---|---|
+| `change:feat` | New capability |
+| `change:fix` | Bug correction |
+| `change:perf` | Measurable performance improvement |
+| `change:breaking` | Non-backwards-compatible API or contract change |
+| `change:refactor` | Internal restructure, no behaviour change |
+| `change:chore` | Tooling, deps, CI, config |
+| `change:docs` | Documentation only |
+| `change:release` | Add alongside any label when this should appear in release notes |
+| `change:release-ff` | Internal fast-forward merge — never shown in external release notes |
+
+`change:release` and `change:release-ff` are mutually exclusive.
+
+## 4 — PR template
+
+Every PR must follow this structure:
+
+```markdown
+## Summary
+<!-- 1–2 sentences. What does this PR do? -->
+
+## Outcome
+<!-- Required. What is the user-facing or system impact?
+     This section is pulled directly into the daily release notes that go to Slack.
+     Be specific: "Forecast exports now support currency filtering, reducing payload size by 80%."
+     Not: "Updated the export function." -->
+
+## Steps to test
+- [ ] Step one
+- [ ] Step two
+
+## Media
+<!-- Screenshot, recording, or diagram. Write "N/A — no UI change" if not applicable. -->
+```
+
+## 5 — Title format
+
+```
+<type>: <short imperative description>
+```
+
+Examples:
+- `feat: add cursor-paginated transaction export`
+- `fix: prevent duplicate webhook deliveries on retry`
+- `perf: cut forecast serving latency from 340ms to 42ms`
+- `feat!: migrate auth to short-lived JWT tokens` ← breaking changes use `!`
+
+## 6 — What makes a good Outcome
+
+The Outcome section feeds directly into automated release notes. It must:
+- Describe the impact to users or the system, not the implementation
+- Be written in the past or present tense ("Users can now…", "The model now…", "Exports now…")
+- Be specific — include numbers or comparisons where available
+- Be a complete sentence, 1–3 sentences max
+
+**Good:** "The dashboard now groups accounts by legal entity with collapsible sections, cutting scroll time by 60% for teams with 20+ accounts."
+
+**Bad:** "Redesigned the sidebar component."
+
+## 7 — CI requirements
+
+The PR label check workflow will block merging if:
+- No `scope:` label is present
+- No `change:` label is present
+- The `## Outcome` section is empty
+- Both `change:release` and `change:release-ff` are applied
+
+Confirm all four conditions are met before telling the engineer the PR is ready.
