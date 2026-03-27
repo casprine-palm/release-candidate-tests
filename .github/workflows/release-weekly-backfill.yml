@@ -1,0 +1,42 @@
+name: Release Weekly (Backfill)
+
+on:
+  workflow_dispatch:
+    inputs:
+      week_ending:
+        description: 'Week ending date in DD-MM-YYYY format (e.g. 14-03-2026)'
+        required: true
+      daily_tags:
+        description: 'Space-separated list of daily release tags to aggregate (e.g. daily-10-03-2026 daily-11-03-2026)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  backfill-weekly:
+    name: Backfill weekly summary
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: .github/scripts/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: .github/scripts
+
+      - name: Generate and publish weekly summary
+        working-directory: .github/scripts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SLACK_WEBHOOK_RELEASES: ${{ secrets.SLACK_WEBHOOK_RELEASES }}
+          WEEK_ENDING: ${{ inputs.week_ending }}
+          DAILY_TAGS: ${{ inputs.daily_tags }}
+        run: node generate-weekly-backfill.js
