@@ -44,9 +44,16 @@ async function getLastRunTimestamp() {
     }
   } catch (err) {
     if (err.status === 404) {
-      // First run — look back 24 hours
-      console.log('No last-daily-run tag found. Defaulting to 24 hours ago.');
-      return new Date(Date.now() - 24 * 60 * 60 * 1000);
+      // First run — look back to start of previous business day.
+      // Monday → Friday, otherwise → yesterday. Ensures weekend merges aren't lost.
+      const now = new Date();
+      const day = now.getUTCDay(); // 0=Sun, 1=Mon, …, 6=Sat
+      const daysBack = day === 1 ? 3 : day === 0 ? 2 : 1;
+      const since = new Date(now);
+      since.setUTCDate(since.getUTCDate() - daysBack);
+      since.setUTCHours(0, 0, 0, 0);
+      console.log(`No last-daily-run tag found. Defaulting to start of ${daysBack === 1 ? 'yesterday' : 'Friday'}: ${since.toISOString()}`);
+      return since;
     }
     throw err;
   }

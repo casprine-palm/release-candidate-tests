@@ -10,7 +10,8 @@
       "Bash(while read:*)",
       "Bash(do gh:*)",
       "Bash(echo \"<!-- forecast recalibration -->\")",
-      "Bash(echo \"<!-- cursor pagination export -->\")"
+      "Bash(echo \"<!-- cursor pagination export -->\")",
+      "Bash(git cherry-pick:*)"
     ]
   }
 }
