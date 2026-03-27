@@ -36,3 +36,4 @@ slack test
 <!-- webhook hmac signing -->
 <!-- forecast recalibration -->
 <!-- cursor pagination export -->
+<!-- dark mode support -->

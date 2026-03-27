@@ -8,7 +8,9 @@
       "Bash(echo \"=== $tag ===\")",
       "Bash(gh pr:*)",
       "Bash(while read:*)",
-      "Bash(do gh:*)"
+      "Bash(do gh:*)",
+      "Bash(echo \"<!-- forecast recalibration -->\")",
+      "Bash(echo \"<!-- cursor pagination export -->\")"
     ]
   }
 }
