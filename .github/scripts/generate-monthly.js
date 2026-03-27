@@ -83,10 +83,11 @@ async function main() {
     console.log('Monthly summary:\n', summary);
   }
 
-  // Convert markdown bold (**text**) to Slack mrkdwn bold (*text*), then strip any leading title line
+  // Convert to Slack mrkdwn: **bold** → *bold*, - bullets → • bullets, strip leading title
   const slackBody = summary
     .replace(/\*\*([^*\n]+)\*\*/g, '*$1*')
     .replace(/^\*[^*\n]+\*\n+/, '')
+    .replace(/^- /gm, '• ')
     .trim();
 
   // Post to Slack
